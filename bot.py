@@ -1,26 +1,24 @@
-import os
 import requests
 
-def get_data():
-    url = "https://www.goldapi.io/api/XAU/TRY"
-    headers = {
-        "x-access-token": os.getenv("GOLDAPI_KEY"),
-        "Content-Type": "application/json"
-    }
-    r = requests.get(url, headers=headers)
-    r.raise_for_status()
-    return r.json()
+API_KEY = "YOUR_API_KEY"
+URL = f"https://v6.exchangerate-api.com/v6/{API_KEY}/latest/USD"
 
 def main():
-    data = get_data()
+    response = requests.get(URL)
+    data = response.json()
 
-    usd_try = data["exchange_rate"]["USD"]
-    eur_try = data["exchange_rate"]["EUR"]
-    gram_altin = data["price_gram_24k"]
+    # Hata kontrolü
+    if data.get("result") != "success":
+        print("API Hatası:", data)
+        return
 
-    print("USD/TRY:", usd_try)
-    print("EUR/TRY:", eur_try)
-    print("Gram Altın (24K):", gram_altin)
+    rates = data["conversion_rates"]
+
+    usd_try = rates["TRY"]
+    eur_try = rates["EUR"]
+
+    print(f"USD/TRY: {usd_try}")
+    print(f"EUR/TRY: {eur_try}")
 
 if __name__ == "__main__":
     main()
